@@ -1,58 +1,87 @@
 'use client';
+import { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { createBookingSchema } from '@/app/schemas/bookingSchema';
+import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import styles from './BookingForm.module.css';
 
 export default function BookingForm() {
-  return (
-    <form className={styles.form}>
+  const [timeSlots, setTimeSlots] = useState([]);
+
+  useEffect(() => {
+    const fetchSlots = async () => {
+      const res = await fetch('/api/time-slots');
+      const data = await res.json();
+      setTimeSlots(data);
+    };
+
+    fetchSlots();
+  }, []);
+
+  const schema = createBookingSchema(timeSlots);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(schema),
+  });
+
+  const onSubmit = (data) => {
+    alert('Booking successful!');
+    console.log(data);
+  };
+
+return (
+    <form className={styles.form} onSubmit={handleSubmit(onSubmit)}>
       <div className={styles.inputGroup}>
-        <label htmlFor="bookerName" className={styles.label}>
-          Booker Name
-        </label> 
-        <input id="bookerName" name="bookerName" className={styles.input} />
+        <label className={styles.label}>Booker Name</label>
+        <input className={styles.input} {...register('bookerName')} />
+        <ErrorMessage message={errors.bookerName?.message} />
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="bookerEmail" className={styles.label}>
-          Booker Email
-        </label>
-        <input id="bookerEmail" name="bookerEmail" className={styles.input} type="email" />
+        <label className={styles.label}>Booker Email</label>
+        <input className={styles.input} {...register('bookerEmail')} />
+        <ErrorMessage message={errors.bookerEmail?.message} />
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="eventName" className={styles.label}>
-          Event Name
-        </label>
-        <input id="eventName" name="eventName" className={styles.input} />
+        <label className={styles.label}>Event Name</label>
+        <input className={styles.input} {...register('eventName')} />
+        <ErrorMessage message={errors.eventName?.message} />
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="eventDate" className={styles.label}>
-          Event Date
-        </label>
-        <input id="eventDate" name="eventDate" className={styles.input} type="date" />
+        <label className={styles.label}>Event Date</label>
+        <input type="date" className={styles.input} {...register('eventDate')} />
+        <ErrorMessage message={errors.eventDate?.message} />
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="numberOfGuests" className={styles.label}>
-          Number of Guests
-        </label>
-        <input id="numberOfGuests" name="numberOfGuests" className={styles.input} type="number" />
+        <label className={styles.label}>Number of Guests</label>
+        <input type="number" className={styles.input} {...register('numberOfGuests')} />
+        <ErrorMessage message={errors.numberOfGuests?.message} />
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="timeSlot" className={styles.label}>
-          Time Slot
-        </label>
-        <select id="timeSlot" name="timeSlot" className={styles.input}>
+        <label className={styles.label}>Time Slot</label>
+        <select className={styles.input} {...register('timeSlot')}>
           <option value="">Select a time slot</option>
+          {timeSlots.map((slot) => (
+            <option key={slot} value={slot}>
+              {slot}
+            </option>
+          ))}
         </select>
+        <ErrorMessage message={errors.timeSlot?.message} />
       </div>
 
       <div className={styles.inputGroup}>
-        <label htmlFor="eventLink" className={styles.label}>
-          Event Link (Online)
-        </label>
-        <input id="eventLink" name="eventLink" className={styles.input} type="url" />
+        <label className={styles.label}>Event Link</label>
+        <input className={styles.input} {...register('eventLink')} />
+        <ErrorMessage message={errors.eventLink?.message} />
       </div>
 
       <button className={styles.button} type="submit">
