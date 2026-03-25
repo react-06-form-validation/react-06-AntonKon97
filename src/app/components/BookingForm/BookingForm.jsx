@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { createBookingSchema } from '@/app/schemas/bookingSchema';
+import { createBookingSchema } from '../../schemas/bookingSchema';
 import ErrorMessage from '../ErrorMessage/ErrorMessage';
 import styles from './BookingForm.module.css';
 
